@@ -2,6 +2,8 @@
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -18,23 +20,18 @@ $context->fromRequest($request);
 
 $urlMatcher = new UrlMatcher($routes, $context);
 
+$controllerResolver = new ControllerResolver();
+$argumentResolver = new ArgumentResolver(); 
+
 try {
-    $resultat = ($urlMatcher->match($request->getPathInfo()));
-    $request->attributes->add($resultat);
+    $request->attributes->add($urlMatcher->match($request->getPathInfo()));
 
-    //classe a instancier
-    $className = substr($resultat['_controller'], 
-    0, 
-    strpos($resultat['_controller'], '@'));
-    
-    //nom de la methode
-    $methodName = substr($resultat['_controller'], 
-    strpos($resultat['_controller'], '@') + 1);
+    $controller = $controllerResolver->getController($request);
+    //[$instance, 'nomDuneMethode']
 
-    // Voila un callable 
-    $controller = [new $className, $methodName];
+    $arguments = $argumentResolver->getArguments($request, $controller);
 
-    $response = call_user_func($controller, $request);
+    $response = call_user_func_array($controller, $arguments);
 }catch(ResourceNotFoundException $e){
     $response = new Response('La page demandée n\'existe pas', 404);
 }catch(Exception $e){
