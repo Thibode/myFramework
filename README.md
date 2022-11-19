@@ -6,10 +6,10 @@ Ce projet a pour but la compréhension du framework Symfony, grâce à une séri
 
 Afin de pouvoir lancer le projet vous aurez besoin de :
 
-                                                    - PHP^7
-                                                    - Composer
-                                                    - Symfony\http-foundation
-                                                    - Symfony\http-kernel
+- PHP^7
+- Composer
+- Symfony\http-foundation
+- Symfony\http-kernels
 
 ```bash
 git clone https://github.com/Thibode/myFramework.git
